@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USC Gloria 1 | United Student Council</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;700;800&display=swap');
+
+    html, body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #030303;
+      color: white;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* --- FANCY PRELOADER --- */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .loader-content-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 150px;
+      width: 100%;
+    }
+
+    .loader-logo-container {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    .loader-glow {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: #3b82f6;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.8;
+      z-index: 1;
+    }
+
+    .loader-ring {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border: 2px solid #3b82f6;
+      border-radius: 50%;
+      z-index: 0;
+      opacity: 0;
+    }
+
+    #loader-logo {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      z-index: 2;
+    }
+
+    .loader-wrap {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loader-text-main {
+      font-size: clamp(2rem, 8vw, 5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-transform: uppercase;
+      display: flex;
+      gap: 0.2em;
+    }
+
+    .char {
+      display: inline-block;
+      transform: translateY(110%);
+    }
+
+    .loader-bar-container {
+      position: absolute;
+      bottom: 10%;
+      width: 200px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: #3b82f6;
+    }
+
+    .overlay-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #3b82f6;
+      z-index: 999;
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+
+    /* --- MAIN STYLES --- */
+    .glass-nav {
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .custom-cursor {
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 10000;
+      mix-blend-mode: difference;
+      transition: width 0.3s, height 0.3s;
+    }
+
+    .custom-cursor.hovered {
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border: 1px solid white;
+    }
+
+    .text-gradient {
+      background: linear-gradient(to right, #3b82f6, #60a5fa, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* --- POLAROID STYLING --- */
+    .photo-stack {
+      background-color: #fff;
+      padding: 6px 6px 18px 6px;
+      box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.8);
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @media (min-width: 768px) {
+        .photo-stack {
+            padding: 10px 10px 28px 10px;
+        }
+    }
+
+    .photo-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      overflow: hidden;
+    }
+
+    .photo-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+      filter: grayscale(100%) contrast(1.1);
+    }
+
+    .photo-slide.active {
+      opacity: 1;
+    }
+
+    @keyframes floating {
+      0%, 100% { transform: translateY(0) rotate(var(--rot)); }
+      50% { transform: translateY(-10px) rotate(var(--rot)); }
+    }
+
+    .animate-float {
+      animation: floating 4s ease-in-out infinite;
+    }
+
+    /* --- GALLERY STYLES --- */
+    .gallery-container {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+      justify-content: center;
+      padding-bottom: 50px;
+    }
+
+    .gallery-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 33.333%;
+    }
+
+    @media (max-width: 768px) {
+      .gallery-container {
+        flex-direction: column;
+        padding-bottom: 20px;
+      }
+      .gallery-col {
+        width: 100%;
+      }
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 4px;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.5s ease;
+    }
+
+    .gallery-item:hover {
+        border-color: #3b82f6;
+        transform: scale(0.98);
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+    }
+
+    .gallery-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: grayscale(100%) brightness(0.7);
+      transition: all 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
+      transform: scale(1.05);
+    }
+
+    .gallery-item:hover .gallery-img {
+      filter: grayscale(0%) brightness(1);
+      transform: scale(1.0);
+    }
+
+    .gallery-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 24px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+      transform: translateY(100%);
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-item:hover .gallery-overlay {
+      transform: translateY(0);
+    }
+
+    /* KETOS AND WAKETOS STYLES */
+    .leader-face-container {
+      mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+      filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.8));
+    }
+    
+    .leader-img {
+        filter: grayscale(100%) contrast(1.1) brightness(0.9);
+        transition: filter 0.5s ease;
+    }
+    
+    .leader-face-container:hover .leader-img {
+        filter: grayscale(0%) contrast(1) brightness(1);
+    }
+
+    .glow-bg {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: #3b82f6;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.2;
+      z-index: -1;
+    }
+    @media (min-width: 768px) {
+        .glow-bg {
+            width: 300px;
+            height: 300px;
+            filter: blur(100px);
+        }
+    }
+
+    .social-icon-btn {
+        box-shadow: 0 0 0 rgba(59, 130, 246, 0);
+    }
+    .social-icon-btn:hover {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+    }
+
+    /* --- ANNOUCEMENT SCROLLER STYLES --- */
+    .marquee-wrapper {
+        display: flex;
+        width: fit-content;
+        will-change: transform;
+    }
+    
+    /* Disable custom cursor on mobile */
+    @media (max-width: 768px) {
+        .custom-cursor { display: none !important; }
+    }
+  </style>
+</head>
+
+<body class="selection:bg-blue-500 selection:text-white">
+
+  <div class="custom-cursor" id="cursor"></div>
+
+  <!-- Preloader UI -->
+  <div id="preloader">
+    <div class="loader-content-wrapper">
+      <div class="loader-wrap text-center absolute">
+        <div class="loader-text-main flex justify-center" id="loader-text">
+          <span class="char">U</span>
+          <span class="char">S</span>
+          <span class="char">C</span>
+        </div>
+      </div>
+      <div class="loader-logo-container" id="logo-container">
+        <div class="loader-glow"></div>
+        <div class="loader-ring" id="loader-ring"></div>
+        <img src="" id="loader-logo" alt="USC Logo">
+      </div>
+    </div>
+    <div class="loader-bar-container">
+      <div class="absolute bottom-full left-0 mb-2 text-blue-500 font-bold text-xs tracking-[0.2em]" id="loader-percentage">0%</div>
+      <div class="loader-bar" id="loader-progress"></div>
+    </div>
+  </div>
+
+  <div class="overlay-panel" id="reveal-panel"></div>
+
+  <!-- Mobile Navigation Menu -->
+  <div id="mobile-menu" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[70] flex flex-col items-center justify-center space-y-8 opacity-0 pointer-events-none transition-all duration-500">
+    <button id="close-menu-btn" class="absolute top-8 right-6 text-white hover:text-blue-500 transition-colors p-2">
+        <i data-lucide="x" class="w-8 h-8"></i>
+    </button>
+    <a href="#home" class="mobile-link text-3xl font-black uppercase tracking-widest hover:text-blue-500 transition-colors">Home</a>
+    <a href="#visi" class="mobile-link text-3xl font-black uppercase tracking-widest hover:text-blue-500 transition-colors">Visi & Misi</a>
+    <a href="#bible-verse" class="mobile-link text-3xl font-black uppercase tracking-widest hover:text-blue-500 transition-colors">Verse</a>
+    <a href="#timeline-section" class="mobile-link text-3xl font-black uppercase tracking-widest hover:text-blue-500 transition-colors">Roadmap</a>
+    <a href="#moments" class="mobile-link text-3xl font-black uppercase tracking-widest hover:text-blue-500 transition-colors">Memories</a>
+    <a href="#departments" class="mobile-link text-3xl font-black uppercase tracking-widest hover:text-blue-500 transition-colors">Team</a>
+  </div>
+
+  <!-- Navigation -->
+  <nav id="navbar" class="fixed w-full z-[60] transition-all duration-500 py-6 md:py-8 opacity-0 glass-nav">
+    <div class="container mx-auto px-6 flex justify-between items-center">
+      <div class="text-xl md:text-2xl font-black tracking-tighter uppercase cursor-pointer hover-trigger">
+        USC<span class="text-blue-500">GLORIA1</span>
+      </div>
+      <div class="hidden lg:flex space-x-8 xl:space-x-12 font-bold">
+        <a href="#home" class="hover-trigger group relative overflow-hidden text-[10px] uppercase tracking-[0.3em]">
+          <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Home</span>
+          <span class="absolute top-full left-0 inline-block transition-transform duration-300 group-hover:-translate-y-full text-blue-500">Home</span>
+        </a>
+        <a href="#visi" class="hover-trigger group relative overflow-hidden text-[10px] uppercase tracking-[0.3em]">
+          <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Visi Misi</span>
+          <span class="absolute top-full left-0 inline-block transition-transform duration-300 group-hover:-translate-y-full text-blue-500">Visi Misi</span>
+        </a>
+        <a href="#bible-verse" class="hover-trigger group relative overflow-hidden text-[10px] uppercase tracking-[0.3em]">
+          <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Verse</span>
+          <span class="absolute top-full left-0 inline-block transition-transform duration-300 group-hover:-translate-y-full text-blue-500">Verse</span>
+        </a>
+        <a href="#timeline-section" class="hover-trigger group relative overflow-hidden text-[10px] uppercase tracking-[0.3em]">
+          <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Roadmap</span>
+          <span class="absolute top-full left-0 inline-block transition-transform duration-300 group-hover:-translate-y-full text-blue-500">Roadmap</span>
+        </a>
+        <a href="#moments" class="hover-trigger group relative overflow-hidden text-[10px] uppercase tracking-[0.3em]">
+          <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Memories</span>
+          <span class="absolute top-full left-0 inline-block transition-transform duration-300 group-hover:-translate-y-full text-blue-500">Memories</span>
+        </a>
+        <a href="#departments" class="hover-trigger group relative overflow-hidden text-[10px] uppercase tracking-[0.3em]">
+          <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Team</span>
+          <span class="absolute top-full left-0 inline-block transition-transform duration-300 group-hover:-translate-y-full text-blue-500">Team</span>
+        </a>
+      </div>
+      <button class="lg:hidden p-2 text-white hover:text-blue-500 transition-colors" id="menu-btn"><i data-lucide="menu" class="w-6 h-6"></i></button>
+    </div>
+  </nav>
+
+  <!-- Start/Hero Section -->
+  <section id="home" class="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+    <div class="absolute inset-0 z-0 bg-gradient-to-b from-black/60 via-transparent to-black pointer-events-none"></div>
+
+    <div class="absolute inset-0 w-full h-full overflow-hidden z-0" id="hero-clip">
+      <video autoplay muted loop playsinline class="w-full h-full object-cover scale-110 brightness-[0.25]" id="hero-video">
+        <source id="hero-video-source" src="" type="video/mp4">
+      </video>
+    </div>
+
+    <!-- BACKGROUND DYNAMIC PHOTO LAYER (Di penuhin JS) -->
+    <div class="absolute inset-0 z-10 hero-frame-container pointer-events-none overflow-hidden" id="hero-polaroids-container">
+        <!-- Di penuhin JS -->
+    </div>
+
+    <!-- START Content -->
+    <div class="relative z-20 text-center px-4 md:px-6 max-w-6xl mt-12 md:mt-16 w-full">
+      <p class="hero-reveal text-blue-500 uppercase tracking-[0.3em] md:tracking-[0.4em] text-[9px] md:text-[11px] font-black mb-4 md:mb-6 opacity-0 drop-shadow-lg">
+        OSIS SMA KRISTEN GLORIA 1 Surabaya
+      </p>
+      <h1 class="hero-reveal text-5xl sm:text-7xl md:text-[7rem] lg:text-[8rem] font-black mb-6 md:mb-8 tracking-tighter leading-[1] md:leading-[0.9] opacity-0 uppercase drop-shadow-2xl px-2">
+        UNITED <span class="text-gradient">STUDENT</span><br />COUNCIL
+      </h1>
+      <div class="hero-reveal opacity-0 mt-8 md:mt-12 hover-trigger">
+        <a href="#visi" class="inline-block bg-white/95 text-black px-8 py-4 md:px-12 md:py-5 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest hover:bg-blue-600 hover:text-white transition-all duration-500">
+          Discover Our Legacy
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Countdown Timer-->
+  <section id="timer" class="py-16 md:py-24 bg-[#050505] border-y border-white/5 relative overflow-hidden">
+    <div class="container mx-auto px-4 md:px-6 relative z-10 flex flex-col items-center">
+        <p class="text-blue-500 font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-[9px] md:text-[10px] mb-4 md:mb-8 reveal-up text-center">Counting Down To</p>
+        <h2 class="text-2xl sm:text-3xl md:text-5xl font-black uppercase mb-10 md:mb-16 tracking-tighter text-center reveal-up">REVETIO 2026</h2>
+        
+        <div id="countdown" class="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-16 reveal-up">
+            <div class="text-center group hover-trigger w-[70px] sm:w-auto">
+                <div id="days" class="text-4xl sm:text-6xl md:text-[7rem] font-black text-white group-hover:text-blue-500 transition-colors duration-500 leading-none">00</div>
+                <div class="text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold mt-2 md:mt-4 text-gray-500">Days</div>
+            </div>
+            <div class="text-center group hover-trigger w-[70px] sm:w-auto">
+                <div id="hours" class="text-4xl sm:text-6xl md:text-[7rem] font-black text-white group-hover:text-blue-500 transition-colors duration-500 leading-none">00</div>
+                <div class="text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold mt-2 md:mt-4 text-gray-500">Hours</div>
+            </div>
+            <div class="text-center group hover-trigger w-[70px] sm:w-auto">
+                <div id="minutes" class="text-4xl sm:text-6xl md:text-[7rem] font-black text-white group-hover:text-blue-500 transition-colors duration-500 leading-none">00</div>
+                <div class="text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold mt-2 md:mt-4 text-gray-500">Mins</div>
+            </div>
+            <div class="text-center group hover-trigger w-[70px] sm:w-auto">
+                <div id="seconds" class="text-4xl sm:text-6xl md:text-[7rem] font-black text-blue-900/40 group-hover:text-blue-500 transition-colors duration-500 leading-none">00</div>
+                <div class="text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold mt-2 md:mt-4 text-gray-500">Secs</div>
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <!-- Vision Section -->
+  <section id="visi" class="py-24 md:py-40 container mx-auto px-6 relative">
+    <!-- small glow behind section -->
+    <div class="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 md:w-96 md:h-96 bg-blue-600/10 blur-[100px] md:blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+    <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-10">
+      
+      <!-- Vision -->
+      <div class="reveal-left text-center lg:text-left">
+        <h2 class="text-5xl sm:text-7xl md:text-9xl font-black mb-6 md:mb-8 leading-[0.85] uppercase">
+          VISI <span class="text-blue-500">&</span><br />MISI
+        </h2>
+        <div class="h-1 w-16 md:w-24 bg-blue-500 mb-8 md:mb-12 mx-auto lg:mx-0"></div>
+        
+        <!-- Vision Card -->
+        <div class="relative bg-white/[0.02] border border-white/5 p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] backdrop-blur-sm text-left shadow-2xl">
+          <i data-lucide="quote" class="absolute top-6 left-6 md:top-8 md:left-8 w-10 h-10 md:w-16 md:h-16 text-blue-500/20"></i>
+          <p class="text-xl sm:text-2xl md:text-4xl text-white font-bold italic relative z-10 leading-snug tracking-tight">
+            "Menjadi wadah aspirasi yang dinamis, inovatif, dan berintegritas."
+          </p>
+          <div class="mt-8 flex items-center gap-4">
+            <div class="h-px bg-blue-500/50 flex-grow"></div>
+            <p class="text-blue-500 uppercase tracking-widest text-[10px] md:text-xs font-bold shrink-0">Our Vision</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mission Cards -->
+      <div class="space-y-6 md:space-y-8">
+        
+        <!-- Mission Card 1 -->
+        <div class="reveal-up relative overflow-hidden bg-[#0a0a0a] border border-white/5 p-8 md:p-10 rounded-[1.5rem] md:rounded-[2rem] group hover:border-blue-500/30 transition-all duration-500 hover:-translate-y-2 shadow-lg">
+          <!-- Large Background Number -->
+          <div class="absolute -right-4 -top-8 text-white/[0.03] group-hover:text-blue-500/10 text-[8rem] md:text-[10rem] font-black transition-colors duration-500 select-none leading-none">01</div>
+          
+          <div class="relative z-10">
+            <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-500">
+              <i data-lucide="lightbulb" class="w-6 h-6 md:w-8 md:h-8 text-blue-500"></i>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-black uppercase mb-3 tracking-tight">Visi</h3>
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">Memuliakan Tuhan dengan menjadi organisasi yang  menerapkan nilai-nilai Pendidikan Kristen yang berkualitas tinggi dalam intelektual, spiritual, mental dan sosial.</p>
+          </div>
+        </div>
+
+        <!-- Mission Card 2 -->
+        <div class="reveal-up relative overflow-hidden bg-[#0a0a0a] border border-white/5 p-8 md:p-10 rounded-[1.5rem] md:rounded-[2rem] group hover:border-blue-500/30 transition-all duration-500 hover:-translate-y-2 shadow-lg delay-100">
+          <!-- Large Background Number -->
+          <div class="absolute -right-4 -top-8 text-white/[0.03] group-hover:text-blue-500/10 text-[8rem] md:text-[10rem] font-black transition-colors duration-500 select-none leading-none">02</div>
+          
+          <div class="relative z-10">
+            <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-500">
+              <i data-lucide="users" class="w-6 h-6 md:w-8 md:h-8 text-blue-500"></i>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-black uppercase mb-3 tracking-tight">Misi</h3>
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">Memberikan kontribusi kepada masyarakat, bangsa, dan negara melalui pendidikan yang berkualitas tinggi dengan membangun generasi muda yang berwawasan global, menguasai iptek, memiliki kedewasaan rohani, moral yang terpuji, kepedulian sosial yang melayani dan jiwa kepemimpinan yang berlandaskan nilai-nilai Kristiani.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- KETOS & WAKETOS SECTION -->
+  <section id="leadership-trigger" class="min-h-screen py-32 md:py-64 bg-[#050505] overflow-hidden relative flex items-center justify-center">
+    
+    <!-- Wakil Ketua OSIS -->
+    <div class="absolute bottom-0 left-0 md:left-[-5%] lg:left-0 z-10 opacity-0 pointer-events-none" id="waketos-face">
+       <!-- Di penuhin JS -->
+    </div>
+
+    <!-- Central Text -->
+    <div class="container mx-auto px-4 md:px-6 relative z-20 text-center max-w-4xl">
+      <p class="text-blue-500 font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-[9px] md:text-xs mb-6 md:mb-8 opacity-0 reveal-child">Our Guiding Principle</p>
+      <h2 class="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black leading-[1] md:leading-[0.9] uppercase tracking-tighter opacity-0 reveal-child drop-shadow-2xl">
+        WE LEAD<br /><span class="text-blue-500">WITH</span> PURPOSE,<br />SERVE WITH<br /><span class="underline decoration-blue-500 decoration-[4px] md:decoration-[10px] underline-offset-4 md:underline-offset-8">HEART</span>.
+      </h2>
+    </div>
+
+    <!-- Ketua OSIS -->
+    <div class="absolute bottom-0 right-0 md:right-[-5%] lg:right-0 z-10 opacity-0 pointer-events-none" id="ketos-face">
+        <!-- Di penuhin JS -->
+    </div>
+
+  </section>
+
+  <!-- BIBLE VERSE SECTION -->
+  <section id="bible-verse" class="py-32 md:py-48 bg-black relative flex items-center justify-center overflow-hidden">
+      <!-- Glow background -->
+      <div class="absolute inset-0 z-0 bg-gradient-to-b from-black via-blue-900/10 to-black pointer-events-none"></div>
+      
+      <div class="container mx-auto px-6 relative z-10 text-center max-w-4xl reveal-up">
+          <div id="verse-container">
+              <!-- Di penuhin JS -->
+          </div>
+      </div>
+  </section>
+
+  <!-- TIMELINE ROADMAP SECTION -->
+  <section id="timeline-section" class="py-24 md:py-40 bg-[#050505] relative border-y border-white/5">
+    <div class="container mx-auto px-4 md:px-6">
+      <div class="text-center mb-16 md:mb-24 reveal-up">
+        <h2 class="text-4xl sm:text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none mb-4 md:mb-6">THE <span class="text-blue-500">JOURNEY</span></h2>
+        <p class="text-gray-500 uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs">A Roadmap of Our Academic Year</p>
+      </div>
+
+      <!-- Timeline wrapper -->
+      <div class="relative w-full max-w-5xl mx-auto py-10" id="timeline-container">
+         <!-- Di penuhin JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Moments & Memories Section -->
+  <section id="moments" class="py-24 md:py-40 bg-black overflow-hidden">
+    <div class="container mx-auto px-6">
+      <div class="mb-16 md:mb-20 text-center md:text-left reveal-up">
+        <h2 class="text-4xl sm:text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none">MOMENTS <span class="text-blue-500">&</span><br />MEMORIES</h2>
+        <p class="text-gray-500 uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs mt-4 md:mt-6">A Collection of Our Best Times</p>
+        
+        <a href="#" id="gallery-link" target="_blank" class="inline-block mt-6 md:mt-8 border border-white/20 bg-white/5 hover:bg-blue-600 hover:border-blue-600 px-6 py-3 md:px-8 md:py-4 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-[0.1em] md:tracking-[0.2em] transition-all duration-300 hover-trigger">
+          Click me to view Pictures
+        </a>
+      </div>
+      
+      <!-- New Gallery Container -->
+      <div class="gallery-container" id="gallery-root">
+        <!-- Di penuhin JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM & DIVISIONS -->
+  <section id="departments" class="py-24 md:py-40 bg-[#030303] relative border-y border-white/5 overflow-hidden">
+    <div class="container mx-auto px-4 md:px-6 relative z-10">
+      
+      <div class="mb-10 md:mb-16 reveal-up flex flex-col lg:flex-row lg:justify-between lg:items-end gap-6 md:gap-8 text-center lg:text-left">
+        <div>
+          <h2 class="text-4xl sm:text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none">OUR <span class="text-blue-500">TEAM</span></h2>
+          <p class="text-gray-500 uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs mt-4 md:mt-6">Divisions & Faces of USC</p>
+        </div>
+        
+        <!-- Slider Controls -->
+        <div class="flex justify-center lg:justify-end items-center gap-4 md:gap-6 pb-2 w-full lg:w-auto">
+            <button id="prev-dept" class="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-blue-600 hover:border-blue-600 transition-all hover-trigger"><i data-lucide="arrow-left" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+            <div id="dept-dots" class="flex gap-1.5 md:gap-2 items-center flex-wrap justify-center max-w-[150px] md:max-w-none">
+                <!-- Di penuhin JS -->
+            </div>
+            <button id="next-dept" class="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-blue-600 hover:border-blue-600 transition-all hover-trigger"><i data-lucide="arrow-right" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+        </div>
+      </div>
+
+      <!-- Container -->
+      <div class="relative w-full overflow-hidden rounded-[1.5rem] md:rounded-[3rem] border border-white/5 bg-[#0a0a0a] reveal-up">
+          <div id="dept-slider-inner" class="flex w-full will-change-transform">
+              <!-- Di penuhin JS -->
+          </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ANNOUNCEMENT SCROLLER -->
+  <div class="py-5 md:py-6 bg-blue-600 overflow-hidden relative z-20 flex items-center rotate-[-2deg] scale-105 origin-center shadow-[0_0_50px_rgba(59,130,246,0.3)] my-10 border-y border-blue-400">
+    <div id="marquee-container" class="w-full flex text-black font-black uppercase tracking-widest text-lg md:text-3xl items-center">
+        <!-- Di penuhin JS -->
+    </div>
+  </div>
+
+  <!-- SOCIAL MEDIA & CONTACT FOOTER -->
+  <footer class="pt-24 pb-10 md:pt-32 md:pb-12 bg-[#050505] relative overflow-hidden">
+    <div class="container mx-auto px-6 relative z-10 flex flex-col items-center text-center">
+      <p class="text-blue-500 uppercase tracking-[0.3em] md:tracking-[0.4em] text-[10px] md:text-xs font-bold mb-4">Let's Talk</p>
+      <h2 class="text-4xl sm:text-5xl md:text-8xl font-black uppercase tracking-tighter mb-12 md:mb-16">
+        STAY <span class="text-white">CONNECTED</span>
+      </h2>
+      
+      <!-- Social Links -->
+      <div class="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-10 mb-16 md:mb-24" id="social-links-container">
+         <!-- Di penuhin JS -->
+      </div>
+
+      <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-8 md:mb-12"></div>
+      
+      <p class="text-gray-600 text-[9px] md:text-xs uppercase tracking-[0.1em] md:tracking-[0.2em]">
+        © 2026 United Student Council SMA Gloria 1 Surabaya. All rights reserved.
+      </p>
+      <p class="text-gray-700 text-[8px] md:text-[10px] uppercase tracking-[0.1em] md:tracking-[0.2em] mt-2">
+        Website Deisgned and Made by Melvin Giordano Deandra
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // ============================================================================
+    // 🛠️ EDITABLE SECTION 🛠️
+    // GANTI SEMUA PICTURES, VIDEOS, AND TEXTS FOR PICS HERE
+    // ============================================================================
+
+    // 1. BACKGROUND VIDEO ON HOME SCREEN
+    // Note: Pake video random, Replace with your own direct .mp4 link (if you want)
+    const HERO_VIDEO_URL = "https://assets.codepen.io/3364143/7btrrd.mp4";
+
+    // 1.5. PRELOADER LOGO IMAGE
+    // LOGO LOADING SCREEN pake logo skolah (.png/.svg)
+    const PRELOADER_LOGO_URL = "LOGO_USC.png";
+
+    // 2. COUNTDOWN TIMER(till when... just masukin date )
+    const TARGET_DATE_STRING = "April 17, 2026 00:08:30";// ex. "January 1, 2030 00:00:00"
+
+    // 3. GOOGLE DOCS LINK IN MEMORIES (ken ur job)
+    const GALLERY_DOCS_LINK = "https://drive.google.com/drive/folders/1Pe3O_G2MdShEBtRAEjFAMxxKnghJVQH0?usp=sharing";
+
+    // 4. TIMELINE TEXTS
+    const timelineData = [
+        { date: "20 February", title: "Ignicia", desc: "Merayakan Hari Raya Imlek." },
+        { date: "17 April", title: "Revitio", desc: "Merayakan Hari Kebangkian Yesus Kristus." },
+        { date: "Juni", title: "Classmeet", desc: "???" },
+        { date: "July", title: "MPLS & Retreat", desc: "Masuknya Murid Angkatan Baru." },
+        { date: "Agustus", title: "Rekrutmen Osis", desc: "Rekrutmen Osis Jabatan Baru." }
+    ];
+
+    // 5. DIVISIONS (Text & Large Pics)
+    const departmentsData = [
+      {
+        name: "Executive", 
+        desc: "Leading the vision and steering the council.",
+        image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        name: "Nationality", 
+        desc: "Fostering patriotism and national pride.",
+        image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        name: "Public Relations", 
+        desc: "Bridging connections within and beyond.",
+        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        name: "Spirituality", 
+        desc: "Nurturing faith and character.",
+        image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        name: "Entrepreneur", 
+        desc: "Creating value and fostering innovation.",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        name: "Social Media", 
+        desc: "The digital voice and visual creators.",
+        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        name: "Documentation", 
+        desc: "Capturing moments and preserving memories.",
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80"
+      }
+    ];
+
+    // 6. KETOS/WAKETOS (Ketos / Waketos Pics & Text)
+    const leadershipData = [
+      {
+        id: "waketos-face",
+        role: "Wakil Ketua OSIS",
+        title: "Zefania Angeline",
+        img: "Zefin.JPG",
+        flip: false
+      },
+      {
+        id: "ketos-face",
+        role: "Ketua OSIS",
+        title: "Gabe Fu",
+        img: "Gabe.JPG", 
+        flip: true
+      }
+    ];
+
+    // 7. BIBLE VERSE (Ganti ayat disini)
+    const verseData = {
+        text: '"Ia sendiri telah memikul dosa kita di dalam tubuh-Nya di kayu salib, supaya kita, yang telah mati terhadap dosa, hidup untuk kebenaran. Oleh bilur-bilur-Nya kamu telah sembuh.”',
+        reference: "1 Petrus 2:24"
+    };
+
+    // 8. MOMENTS & MEMORIES (Pics & Text)
+    const momentsData = [
+        { title: "Ignicia", img: "Ignicia.JPG" },
+        { title: "Ahava", img: "Ahava.JPG" },
+        { title: "LDKS", img: "LDKS.JPG" },
+        { title: "DBL 2025", img: "DBL_2025.JPG" },
+        { title: "Meraki", img: "Meraki.JPG" },
+        { title: "Luceat 2.0", img: "Luceat.JPG" },
+        { title: "Inquiria", img: "MPLS.jpeg" },
+        { title: "Awaken", img: "Awaken.jpeg" },
+        { title: "Loud", img: "Loud.JPG" }
+    ];
+
+    // 9. POLAROID PICTURES (List 2 URLs per polaroid)
+    const heroPolaroidsData = [
+      {
+        pos: "top-[10%] left-[5%] w-16 md:w-52 aspect-[3/4]", rot: -8, speed: 0.03, delay: 0,
+        images: ["Ignicia.JPG", "Ahava.JPG"]
+      },
+      {
+        pos: "top-[15%] right-[5%] w-20 md:w-56 aspect-square", rot: 5, speed: 0.05, delay: 1.2,
+        images: ["Ignicia.JPG", "Ahava.JPG"]
+      },
+      {
+        pos: "top-[40%] left-[2%] w-16 md:w-44 aspect-video", rot: -4, speed: 0.02, delay: 0.5,
+        images: ["LDKS.JPG", "DBL_2025.JPG"]
+      },
+      {
+        pos: "top-[50%] right-[2%] w-20 md:w-48 aspect-[3/4]", rot: 9, speed: 0.06, delay: 1.8,
+        images: ["LDKS.JPG", "DBL_2025.JPG"]
+      },
+      {
+        pos: "bottom-[10%] left-[20%] w-14 md:w-44 aspect-square", rot: -12, speed: 0.04, delay: 2.5,
+        images: ["Meraki.JPG", "Luceat.JPG"]
+      },
+      {
+        pos: "bottom-[12%] right-[15%] w-24 md:w-64 aspect-[3/4] z-20 shadow-2xl", rot: -3, speed: 0.07, delay: 0.8,
+        images: ["Meraki.JPG", "Luceat.JPG"]
+      },
+      {
+        pos: "top-[8%] left-[35%] w-12 md:w-40 aspect-square opacity-70", rot: 4, speed: 0.02, delay: 1.5,
+        images: ["MPLS.jpeg", "Awaken.jpeg"]
+      },
+      {
+        pos: "bottom-[20%] left-[50%] w-16 md:w-44 aspect-video opacity-80", rot: 2, speed: 0.03, delay: 3,
+        images: ["MPLS.jpeg", "Awaken.jpeg"]
+      },
+      {
+        pos: "bottom-[2%] left-[2%] w-20 md:w-52 aspect-[4/5]", rot: 10, speed: 0.05, delay: 2,
+        images: ["Loud.JPG", "Awaken.jpeg", "DBL_2025.JPG"]
+      },
+      {
+        pos: "top-[28%] right-[2%] w-16 md:w-44 aspect-[3/4]", rot: -6, speed: 0.04, delay: 0.3,
+        images: ["Loud.JPG", "Awaken.jpeg", "DBL_2025.JPG"]
+      }
+    ];
+
+    // 10. SOCIAL MEDIA LINKS & ICONS
+    const socialMediaData = [
+        { platform: "YouTube", link: "https://www.youtube.com/@USC_Gloria1", icon: "youtube.png" },
+        { platform: "TikTok", link: "https://www.tiktok.com/@usc_gloria1", icon: "tiktok.png" },
+        { platform: "Instagram", link: "https://instagram.com/your-profile", icon: "instagram.png" },
+        { platform: "Email", link: "https://www.uscgloria1.xyz/", icon: "website.png" }
+    ];
+
+    // 11. ANNOUCEMENT SCROLLER
+    const announcementsData = [
+        "✝️ Happy Easter ✝️",
+        "🌟 He Has Risen 🌟",
+        "✨ REVETIO : 17 April ✨"
+    ];
+
+    // ============================================================================
+    // END OF EDITABLE SECTION - JGN PEGANG YG DIBAWA KECUALI HARUS!!!!
+    // ============================================================================
+
+    // Setup Configured Settings
+    const heroVideo = document.getElementById('hero-video');
+    document.getElementById('hero-video-source').src = HERO_VIDEO_URL;
+    heroVideo.load();
+    heroVideo.play().catch(e => console.log("Autoplay prevented by browser:", e));
+    
+    document.getElementById('loader-logo').src = PRELOADER_LOGO_URL;
+    document.getElementById('gallery-link').href = GALLERY_DOCS_LINK;
+
+    // ==========================================
+    // Fungsi  RENDERRRRRRRRRR (jgn diubah unless yk what youre doing bru)
+    // ==========================================
+
+    function renderHeroPolaroids() {
+        const container = document.getElementById('hero-polaroids-container');
+        if(!container) return;
+        container.innerHTML = heroPolaroidsData.map(item => `
+            <div class="absolute ${item.pos} photo-stack hero-float animate-float" style="--rot: ${item.rot}deg; animation-delay: ${item.delay}s" data-speed="${item.speed}">
+                <div class="photo-inner photo-cycle">
+                    ${item.images.map((img, i) => `<img src="${img}" class="photo-slide ${i===0?'active':''}">`).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderLeadership() {
+        const waketosContainer = document.getElementById('waketos-face');
+        const ketosContainer = document.getElementById('ketos-face');
+
+        if(waketosContainer && leadershipData[0]) {
+            const data = leadershipData[0];
+            waketosContainer.innerHTML = `
+              <div class="glow-bg bottom-0 left-0 md:left-10"></div>
+              <div class="relative w-[45vw] sm:w-[50vw] md:w-[600px] leader-face-container">
+                <img src="${data.img}" class="w-full h-auto object-cover leader-img ${data.flip ? 'scale-x-[-1]' : ''}" alt="${data.title}">
+                <div class="absolute bottom-6 left-4 sm:bottom-10 sm:left-10 md:bottom-20 md:left-24">
+                    <p class="text-blue-500 font-bold uppercase tracking-widest text-[8px] sm:text-[10px] md:text-xs">${data.role}</p>
+                    <p class="text-lg sm:text-2xl md:text-4xl font-black uppercase tracking-tighter">${data.title}</p>
+                </div>
+              </div>
+            `;
+        }
+
+        if(ketosContainer && leadershipData[1]) {
+            const data = leadershipData[1];
+            ketosContainer.innerHTML = `
+              <div class="glow-bg bottom-0 right-0 md:right-10"></div>
+              <div class="relative w-[45vw] sm:w-[50vw] md:w-[600px] leader-face-container">
+                <img src="${data.img}" class="w-full h-auto object-cover leader-img ${data.flip ? 'scale-x-[-1]' : ''}" alt="${data.title}">
+                <div class="absolute bottom-6 right-4 sm:bottom-10 sm:right-10 md:bottom-20 md:right-24 text-right">
+                    <p class="text-blue-500 font-bold uppercase tracking-widest text-[8px] sm:text-[10px] md:text-xs">${data.role}</p>
+                    <p class="text-lg sm:text-2xl md:text-4xl font-black uppercase tracking-tighter">${data.title}</p>
+                </div>
+              </div>
+            `;
+        }
+    }
+
+    function renderBibleVerse() {
+        const container = document.getElementById('verse-container');
+        if(!container) return;
+        
+        container.innerHTML = `
+            <i data-lucide="book-open" class="w-12 h-12 md:w-16 md:h-16 text-white/10 mx-auto mb-8"></i>
+            <h2 class="text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-relaxed md:leading-snug mb-10 italic">
+                ${verseData.text}
+            </h2>
+            <div class="w-16 h-1 bg-white/20 mx-auto mb-8"></div>
+            <p class="text-xl md:text-2xl lg:text-3xl font-black text-blue-500 uppercase tracking-[0.2em]">
+                ${verseData.reference}
+            </p>
+        `;
+    }
+
+    function renderTimeline() {
+        const container = document.getElementById('timeline-container');
+        if(!container) return;
+        
+        let html = `
+            <!-- The Base Line & Progress Line -->
+            <div class="absolute left-[30px] md:left-1/2 top-0 bottom-0 w-1 bg-white/10 -translate-x-1/2 rounded-full"></div>
+            <div class="absolute left-[30px] md:left-1/2 top-0 h-0 w-1 bg-blue-500 shadow-[0_0_15px_#3b82f6] -translate-x-1/2 rounded-full" id="timeline-progress-line"></div>
+        `;
+
+        html += timelineData.map((item, i) => {
+            const isEven = i % 2 === 0;
+            return `
+            <div class="relative flex items-center w-full mb-16 md:mb-24 timeline-row opacity-0 translate-y-10 group">
+                
+                <!-- Left Content (Empty on mobile, alternating on desktop) -->
+                <div class="hidden md:block w-1/2 ${isEven ? 'text-right pr-12 lg:pr-16' : 'order-3 pl-12 lg:pl-16'}">
+                    ${isEven ? `
+                        <h3 class="text-2xl lg:text-3xl font-black uppercase group-hover:text-blue-400 transition-colors">${item.title}</h3>
+                        <p class="text-gray-400 mt-2 text-xs lg:text-sm max-w-sm ml-auto">${item.desc}</p>
+                    ` : `
+                        <p class="text-blue-500 font-bold uppercase tracking-widest text-lg lg:text-xl">${item.date}</p>
+                    `}
+                </div>
+
+                <!-- Center Node -->
+                <div class="absolute left-[30px] md:left-1/2 w-4 h-4 md:w-5 md:h-5 rounded-full bg-black border-[3px] md:border-4 border-blue-500 -translate-x-1/2 z-10 timeline-node transition-all duration-300 group-hover:scale-150 group-hover:bg-blue-500 group-hover:shadow-[0_0_20px_#3b82f6]"></div>
+
+                <!-- Right Content (Full width on mobile, alternating on desktop) -->
+                <div class="w-full pl-14 md:w-1/2 md:pl-0 ${isEven ? 'order-3 md:pl-12 lg:pl-16' : 'md:text-right md:pr-12 lg:pr-16'}">
+                    ${isEven ? `
+                        <!-- Mobile View (Always text on right) -->
+                        <p class="text-blue-500 font-bold uppercase tracking-widest text-sm sm:text-base md:hidden mb-1">${item.date}</p>
+                        <h3 class="text-xl sm:text-2xl font-black uppercase md:hidden group-hover:text-blue-400 transition-colors">${item.title}</h3>
+                        <p class="text-gray-400 mt-1 sm:mt-2 text-xs sm:text-sm md:hidden pr-4">${item.desc}</p>
+                        
+                        <!-- Desktop View (Date on Right) -->
+                        <p class="hidden md:block text-blue-500 font-bold uppercase tracking-widest text-lg lg:text-xl">${item.date}</p>
+                    ` : `
+                        <p class="text-blue-500 font-bold uppercase tracking-widest text-sm sm:text-base md:hidden mb-1">${item.date}</p>
+                        <h3 class="text-xl sm:text-2xl lg:text-3xl font-black uppercase group-hover:text-blue-400 transition-colors">${item.title}</h3>
+                        <p class="text-gray-400 mt-1 sm:mt-2 text-xs lg:text-sm max-w-sm pr-4 md:pr-0 md:ml-auto ${!isEven ? '' : 'md:mr-auto md:ml-0'}">${item.desc}</p>
+                    `}
+                </div>
+            </div>
+            `;
+        }).join('');
+
+        container.innerHTML = html;
+    }
+
+    // slider state
+    let currentDeptSlide = 0;
+
+    function renderDepartments() {
+        const sliderInner = document.getElementById('dept-slider-inner');
+        const dotsContainer = document.getElementById('dept-dots');
+        if(!sliderInner || !dotsContainer) return;
+        
+        // 1. render slides
+        sliderInner.innerHTML = departmentsData.map((dept, i) => `
+            <div class="min-w-full w-full shrink-0 flex flex-col md:flex-row h-auto md:h-full">
+                
+                <!-- Division Info Panel -->
+                <div class="w-full md:w-2/5 lg:w-1/3 p-6 sm:p-10 lg:p-16 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 bg-white/[0.02]">
+                    <div class="text-blue-500/20 font-black text-5xl sm:text-6xl md:text-7xl mb-4 md:mb-6">0${i+1}</div>
+                    <h3 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black uppercase mb-4 md:mb-6 leading-tight break-words hyphens-auto">${dept.name}</h3>
+                    <div class="w-8 md:w-12 h-1 bg-blue-500 mb-6 md:mb-8"></div>
+                    <p class="text-gray-400 tracking-widest uppercase text-[10px] sm:text-xs md:text-sm leading-relaxed">${dept.desc}</p>
+                </div>
+
+                <!-- Division Full Picture -->
+                <div class="w-full md:w-3/5 lg:w-2/3 relative group overflow-hidden h-[40vh] sm:h-[50vh] md:h-auto min-h-[300px] md:min-h-[60vh] hover-trigger bg-[#050505]">
+                    <img src="${dept.image}" class="absolute inset-0 w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-6 sm:bottom-10 left-6 sm:left-10 md:bottom-12 md:left-12 right-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <p class="text-blue-500 text-[9px] md:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">USC Gloria 1</p>
+                        <h4 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black uppercase tracking-tight break-words">${dept.name} Division</h4>
+                    </div>
+                </div>
+                
+            </div>
+        `).join('');
+
+        // 2. render dots
+        dotsContainer.innerHTML = departmentsData.map((_, i) => `
+            <button class="dept-dot h-2 rounded-full transition-all duration-300 ${i === 0 ? 'w-6 md:w-8 bg-blue-500' : 'w-2 bg-white/20'}" data-index="${i}"></button>
+        `).join('');
+    }
+
+    function renderSocialLinks() {
+        const container = document.getElementById('social-links-container');
+        if(!container) return;
+        
+        container.innerHTML = socialMediaData.map(social => `
+            <a href="${social.link}" target="_blank" title="${social.platform}" class="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border border-white/10 flex items-center justify-center hover:bg-blue-600 hover:border-blue-600 transition-all duration-300 hover-trigger group social-icon-btn bg-white/5 backdrop-blur-md">
+                <img src="${social.icon}" alt="${social.platform}" class="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 object-contain group-hover:scale-110 transition-transform duration-300">
+            </a>
+        `).join('');
+    }
+
+    function renderMarquee() {
+        const container = document.getElementById('marquee-container');
+        if(!container) return;
+        
+        // annoucement separator
+        const combinedText = announcementsData.join(" &nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp; ") + " &nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp; ";
+        // loop separator
+        const repeatedText = combinedText.repeat(5);
+        
+        // Two identical blocks translating left continuously
+        container.innerHTML = `
+            <div class="marquee-wrapper cursor-default" id="marquee-inner-wrapper">
+                <div class="flex whitespace-nowrap shrink-0">${repeatedText}</div>
+                <div class="flex whitespace-nowrap shrink-0">${repeatedText}</div>
+            </div>
+        `;
+
+        const wrapper = document.getElementById('marquee-inner-wrapper');
+        if (wrapper) {
+            // GSAP loop
+            const marqueeTween = gsap.to(wrapper, {
+                xPercent: -50,
+                ease: "none",
+                duration: 25, // Ganti ini = Ganti speed scroller
+                repeat: -1
+            });
+
+            //braking effect (ke 15% speed in 1.2 seconds)
+            container.addEventListener('mouseenter', () => {
+                gsap.to(marqueeTween, { timeScale: 0.15, duration: 1.2, ease: "power2.out" });
+            });
+            
+            //acceleration effect (balik in 1.2 seconds)
+            container.addEventListener('mouseleave', () => {
+                gsap.to(marqueeTween, { timeScale: 1, duration: 1.2, ease: "power2.in" });
+            });
+        }
+    }
+
+    function initDepartmentsSlider() {
+        const nextBtn = document.getElementById('next-dept');
+        const prevBtn = document.getElementById('prev-dept');
+        const dots = document.querySelectorAll('.dept-dot');
+        const sliderInner = document.getElementById('dept-slider-inner');
+        const totalSlides = departmentsData.length;
+
+        if(!nextBtn || !prevBtn || !sliderInner) return;
+
+        function updateSlider() {
+            // animate wrapper ? i still dk what this does i just need it
+            gsap.to(sliderInner, {
+                x: `-${currentDeptSlide * 100}%`,
+                duration: 0.8,
+                ease: "power3.inOut"
+            });
+
+            // ngeupdate dots
+            dots.forEach((dot, index) => {
+                if(index === currentDeptSlide) {
+                    dot.classList.remove('w-2', 'bg-white/20');
+                    dot.classList.add('w-6', 'md:w-8', 'bg-blue-500');
+                } else {
+                    dot.classList.remove('w-6', 'md:w-8', 'bg-blue-500');
+                    dot.classList.add('w-2', 'bg-white/20');
+                }
+            });
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentDeptSlide = (currentDeptSlide + 1) % totalSlides;
+            updateSlider();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentDeptSlide = (currentDeptSlide - 1 + totalSlides) % totalSlides;
+            updateSlider();
+        });
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                currentDeptSlide = parseInt(e.target.dataset.index);
+                updateSlider();
+            });
+        });
+    }
+
+    function renderMoments() {
+        const container = document.getElementById('gallery-root');
+        if(!container) return;
+        
+        const col1 = momentsData.filter((_, i) => i % 3 === 0);
+        const col2 = momentsData.filter((_, i) => i % 3 === 1);
+        const col3 = momentsData.filter((_, i) => i % 3 === 2);
+        
+        const createColumn = (items, className) => `
+            <div class="gallery-col ${className}">
+                ${items.map(m => `
+                    <div class="gallery-item hover-trigger">
+                        <img src="${m.img}" class="gallery-img">
+                        <div class="gallery-overlay">
+                             <p class="font-black uppercase tracking-widest text-[10px] md:text-xs text-blue-400 mb-1">USC Memory</p>
+                             <h4 class="text-xl md:text-2xl font-bold uppercase glitch-text">${m.title}</h4>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        container.innerHTML = `
+            ${createColumn(col1, 'col-odd')}
+            ${createColumn(col2, 'col-even')}
+            ${createColumn(col3, 'col-odd')}
+        `;
+    }
+
+    // mulai render stuff in
+    renderHeroPolaroids();
+    renderLeadership();
+    renderBibleVerse();
+    renderTimeline();
+    renderMoments();
+    renderDepartments();
+    renderMarquee();
+    renderSocialLinks();
+    
+    // icons after nge load
+    lucide.createIcons();
+    gsap.registerPlugin(ScrollTrigger, TextPlugin);
+    
+    // mulai sliders
+    initDepartmentsSlider();
+
+    // ==========================================
+    // TEMPAT ANIMASI SAMA LOGIC INTERAKSI 
+    // ==========================================
+
+    // biar mobile bisa mobile
+    const menuBtn = document.getElementById('menu-btn');
+    const closeMenuBtn = document.getElementById('close-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+    
+    function openMenu() {
+        mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+        document.body.style.overflow = 'hidden'; // biar background ga goofy
+    }
+    
+    function closeMenu() {
+        mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+        document.body.style.overflow = '';
+    }
+
+    if(menuBtn && closeMenuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', openMenu);
+        closeMenuBtn.addEventListener('click', closeMenu);
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+    }
+
+    // circle cursor (pc tok)
+    const cursor = document.getElementById('cursor');
+    function initCursor() {
+        if(window.innerWidth <= 768) return; // biar mobile ga aneh
+        
+        const hoverTriggers = document.querySelectorAll('.hover-trigger');
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
+            
+            const floats = document.querySelectorAll('.hero-float');
+            floats.forEach(float => {
+                const speed = float.getAttribute('data-speed');
+                const x = (window.innerWidth - e.pageX * speed) / 100;
+                const y = (window.innerHeight - e.pageY * speed) / 100;
+                gsap.to(float, { x: x, y: y, duration: 1.5, ease: "power2.out" });
+            });
+        });
+
+        hoverTriggers.forEach(trigger => {
+            trigger.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            trigger.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+        
+        // TO FIX BUG IN MOMENTS & MEMORIES JGN DIUBAH 
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        galleryItems.forEach(item => {
+            const text = item.querySelector('.glitch-text');
+            if(!text) return;
+            const originalText = text.innerText;
+            
+            item.addEventListener('mouseenter', () => {
+                gsap.to(text, {
+                    duration: 0.5,
+                    scrambleText: { text: originalText, chars: "0123456789!@#$%^&*", revealDelay: 0.1, speed: 0.3 }
+                });
+            });
+        });
+    }
+    initCursor();
+
+    // countdown event
+    const countdownTarget = new Date(TARGET_DATE_STRING).getTime();
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const diff = countdownTarget - now;
+        if (diff > 0) {
+            const elDays = document.getElementById('days');
+            const elHours = document.getElementById('hours');
+            const elMins = document.getElementById('minutes');
+            const elSecs = document.getElementById('seconds');
+            if(elDays) elDays.innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+            if(elHours) elHours.innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+            if(elMins) elMins.innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            if(elSecs) elSecs.innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        }
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    //foto berubah every few secs （￣︶￣）↗　
+    const cycles = document.querySelectorAll('.photo-cycle');
+    cycles.forEach((container, idx) => {
+        const slides = container.querySelectorAll('.photo-slide');
+        let current = 0;
+        setTimeout(() => {
+            setInterval(() => {
+                slides[current].classList.remove('active');
+                current = (current + 1) % slides.length;
+                slides[current].classList.add('active');
+            }, 3000 + (idx * 400));
+        }, idx * 500);
+    });
+
+    // masuknya timeline
+    const tl = gsap.timeline();
+    const progressStats = { val: 0 };
+
+    tl.to(".char", { y: 0, stagger: 0.1, duration: 0.8, ease: "power4.out", delay: 0.2 })
+      .to(progressStats, {
+          val: 45, 
+          duration: 0.8, 
+          ease: "power2.inOut",
+          onUpdate: function() {
+              const el = document.getElementById("loader-percentage");
+              if(el) el.innerHTML = Math.round(progressStats.val) + "%";
+          }
+      }, "<")
+      .to("#loader-progress", { width: "45%", duration: 0.8, ease: "power2.inOut" }, "<")
+      
+      .to("#loader-text", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" })
+      
+      .fromTo("#logo-container", 
+          { opacity: 0, scale: 0.5, rotation: -15 }, 
+          { opacity: 1, scale: 1, rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.5)" }, 
+          "-=0.2"
+      )
+      .fromTo("#loader-ring",
+          { scale: 0.8, opacity: 1 },
+          { scale: 2.5, opacity: 0, duration: 1, ease: "power3.out" },
+          "<0.2"
+      )
+      
+      .to(progressStats, {
+          val: 100, 
+          duration: 0.8, 
+          ease: "power2.inOut",
+          delay: 0.3,
+          onUpdate: function() {
+              const el = document.getElementById("loader-percentage");
+              if(el) el.innerHTML = Math.round(progressStats.val) + "%";
+          }
+      })
+      .to("#loader-progress", { width: "100%", duration: 0.8, ease: "power2.inOut" }, "<")
+      
+      .to("#logo-container", { scale: 1.3, opacity: 0, filter: "blur(10px)", duration: 0.4, ease: "power2.in" })
+      .to("#loader-percentage", { opacity: 0, duration: 0.2 }, "<")
+      .to(".loader-bar-container", { opacity: 0, duration: 0.2 }, "<")
+      .to("#reveal-panel", { scaleY: 1, duration: 0.6, ease: "expo.inOut" }, "-=0.2")
+      .set("#preloader", { display: "none" })
+      .to("#reveal-panel", { scaleY: 0, transformOrigin: "top", duration: 0.6 })
+      .to(".hero-reveal", { opacity: 1, y: -20, stagger: 0.15, duration: 0.8, ease: "power3.out" })
+      .from(".photo-stack", { opacity: 0, y: 100, scale: 0.5, stagger: 0.05, duration: 1.5, ease: "back.out(1.4)" }, "-=0.5")
+      .to("#navbar", { opacity: 1, y: 0, duration: 0.8 }, "-=1");
+
+    // Timeline animation go BRRRRRRR (took a week to figure out btw)
+    const timelineProgressLine = document.getElementById("timeline-progress-line");
+    if(timelineProgressLine) {
+        gsap.to(timelineProgressLine, {
+            height: "100%",
+            ease: "none",
+            scrollTrigger: {
+                trigger: "#timeline-container",
+                start: "top center",
+                end: "bottom center",
+                scrub: 0.5
+            }
+        });
+    }
+
+    gsap.utils.toArray('.timeline-row').forEach(row => {
+        gsap.to(row, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            scrollTrigger: {
+                trigger: row,
+                start: "top 75%"
+            }
+        });
+    });
+
+    // muka muka scroll (jgn diubah pls)
+    const waketosFace = document.getElementById("waketos-face");
+    const ketosFace = document.getElementById("ketos-face");
+    
+    if(waketosFace && ketosFace) {
+        const leadershipTL = gsap.timeline({
+          scrollTrigger: {
+            trigger: "#leadership-trigger",
+            start: "top bottom",
+            end: "top 10%",
+            scrub: 1.5,
+          }
+        });
+        leadershipTL
+          .fromTo(waketosFace, { xPercent: -100, opacity: 0 }, { xPercent: 0, opacity: 1 }, 0)
+          .fromTo(ketosFace, { xPercent: 100, opacity: 0 }, { xPercent: 0, opacity: 1 }, 0)
+          .to(".reveal-child", { opacity: 1, y: 0, stagger: 0.2, duration: 1 }, 0.2);
+    }
+
+    // galeri scroll (jgn diubah pls)
+    if (window.innerWidth > 768) {
+        gsap.utils.toArray('.col-odd').forEach(col => {
+            gsap.to(col, {
+                y: -50,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#moments",
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: 1
+                }
+            });
+        });
+
+        gsap.utils.toArray('.col-even').forEach(col => {
+            gsap.from(col, {
+                y: -100,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#moments",
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: 1
+                }
+            });
+        });
+    }
+
+    gsap.utils.toArray('.reveal-up').forEach(el => {
+      gsap.from(el, {
+        y: 80, opacity: 0, duration: 1.2,
+        scrollTrigger: { trigger: el, start: "top 90%" }
+      });
+    });
+
+    gsap.from('.reveal-left', {
+        x: -100, opacity: 0, duration: 1.2,
+        scrollTrigger: { trigger: '.reveal-left', start: "top 80%" }
+    });
+    
+    // buat nge fix bug GSAP :)
+    let resizeTimer;// Ion understand ts i just google
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            ScrollTrigger.refresh();
+        }, 250);
+    });
+
+    // Backup to make sure everything di tempat seng bener :)
+    window.addEventListener("load", () => {
+        ScrollTrigger.refresh();
+    });
+  </script>
+</body>
+</html>
