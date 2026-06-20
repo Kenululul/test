@@ -12,7 +12,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;700;800&family=Playfair+Display:ital,wght@0,600;1,500;1,600&family=Rye&display=swap');
 
     html, body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -285,12 +285,7 @@
     }
     
     .leader-img {
-        filter: grayscale(100%) contrast(1.1) brightness(0.9);
-        transition: filter 0.5s ease;
-    }
-    
-    .leader-face-container:hover .leader-img {
-        filter: grayscale(0%) contrast(1) brightness(1);
+        filter: none;
     }
 
     .glow-bg {
@@ -433,7 +428,7 @@
         UNITED <span class="text-gradient">STUDENT</span><br />COUNCIL
       </h1>
       <div class="hero-reveal opacity-0 mt-8 md:mt-12 hover-trigger">
-        <a href="#visi" class="inline-block bg-white/95 text-black px-8 py-4 md:px-12 md:py-5 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest hover:bg-blue-600 hover:text-white transition-all duration-500">
+        <a href="#timer" class="inline-block bg-white/95 text-black px-8 py-4 md:px-12 md:py-5 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest hover:bg-blue-600 hover:text-white transition-all duration-500">
           Discover Our Legacy
         </a>
       </div>
@@ -464,6 +459,18 @@
                 <div class="text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold mt-2 md:mt-4 text-gray-500">Secs</div>
             </div>
         </div>
+    </div>
+  </section>
+
+  <!-- LUCEAT Poster Section -->
+  <section id="luceat" class="py-16 md:py-24 bg-black relative overflow-hidden">
+    <div class="container mx-auto px-4 md:px-6 relative z-10 flex flex-col items-center">
+      <p class="text-blue-500 font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-[9px] md:text-[10px] mb-4 md:mb-8 reveal-up text-center">Upcoming Event</p>
+      <h2 class="text-2xl sm:text-3xl md:text-5xl font-black uppercase mb-10 md:mb-16 tracking-tighter text-center reveal-up">LUCEAT 2026</h2>
+
+      <div class="relative w-full max-w-5xl overflow-hidden rounded-[1.5rem] md:rounded-[3rem] border border-white/5 bg-[#0a0a0a] reveal-up shadow-2xl">
+        <img src="Luceat_Poster.JPG" alt="LUCEAT 2026 - Independence Day Celebration Poster" class="w-full h-auto object-cover">
+      </div>
     </div>
   </section>
 
@@ -683,9 +690,10 @@
     const timelineData = [
         { date: "20 Februari", title: "Ignicia", desc: "Merayakan Hari Raya Imlek." },
         { date: "17 April", title: "Revetio", desc: "Merayakan Hari Kebangkian Yesus Kristus." },
-        { date: "09-10 Juni", title: "Classmeet", desc: "???" },
+        { date: "09-10 Juni", title: "The Nite", desc: "A night at Gloria" },
         { date: "06-10 Juli", title: "MPLS & Retreat", desc: "Masuknya Murid Angkatan Baru." },
-        { date: "Agustus", title: "Rekrutmen Osis", desc: "Rekrutmen Osis Jabatan Baru." }
+        { date: "18 Agustus", title: "Luceat 3.0", desc: "Independence day competitions and celebration." },
+        { date: "Agustus", title: "Regenerasi Osis", desc: "Rekrutmen Osis Jabatan Baru." }
     ];
 
     // 5. DIVISIONS (Text & Large Pics)
@@ -723,7 +731,7 @@
       {
         name: "Documentation", 
         desc: "Capturing moments and preserving memories.",
-        image: "Dokum.jpeg"
+        image: "Dokum.jpg"
       }
     ];
 
@@ -741,27 +749,27 @@
         role: "Wakil ketua Osis",
         title: "Zefania Angeline",
         img: "Zefin.png", 
-        flip: true
+        flip: false
       }
     ];
 
     // 7. BIBLE VERSE (Ganti ayat disini)
     const verseData = {
-        text: '"Marilah kepada-Ku, semua yang letih lesu dan berbeban berat, Aku akan memberikan kelegaan kepadamu.”',
-        reference: "Matius 11:28"
+        text: '"Sekiranya engkau memperhatikan perintah-perintah-Ku, maka damai sejahteramu akan seperti sungai yang tidak pernah kering, dan kebahagiaanmu akan terus berlimpah seperti gelombang-gelombang laut yang tidak pernah berhenti.”',
+        reference: "Yesaya 48:18"
     };
 
     // 8. MOMENTS & MEMORIES (Pics & Text)
     const momentsData = [
         { title: "Ignicia", img: "Ignicia.JPG" },
         { title: "Ahava", img: "Ahava.JPG" },
-        { title: "LDKS", img: "LDKS.JPG" },
+        { title: "The Nite", img: "Nite.JPG" },
         { title: "DBL 2025", img: "DBL_2025.JPG" },
         { title: "Meraki", img: "Meraki.JPG" },
         { title: "Luceat 2.0", img: "Luceat.JPG" },
         { title: "Inquiria", img: "MPLS.jpeg" },
         { title: "Awaken", img: "Awaken.jpeg" },
-        { title: "Loud", img: "Loud.JPG" }
+        { title: "Revetio", img: "Revetio.jpeg" }
     ];
 
     // 9. POLAROID PICTURES (List 2 URLs per polaroid)
